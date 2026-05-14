@@ -1,11 +1,16 @@
 const std = @import("std");
-
+const randomAgent = @import("randomAgent.zig");
 const tictactoe = @import("tictactoe.zig");
 
-pub fn main() !void {
-    var ticTacToeGame = tictactoe.TicTacToeState{};
+pub fn main(init: std.process.Init) !void {
+    const io = init.io;
+    const rng_impl: std.Random.IoSource = .{ .io = io };
+    const secureRand = rng_impl.interface();
 
-    tictactoe.renderBoard(&ticTacToeGame);
+    var gameState = tictactoe.TicTacToeState{};
 
-    std.debug.print("is game won: {}\n", .{tictactoe.isGameWon(&ticTacToeGame)});
+    const action = randomAgent.randomAction(secureRand, &gameState);
+
+    std.debug.print("action: {any}\n", .{action});
 }
+
