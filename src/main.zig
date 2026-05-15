@@ -16,7 +16,7 @@ pub fn main(init: std.process.Init) !void {
     var qAgent = qlearning.Agent.init(allocator);
     defer qAgent.deinit();
 
-    const episodes = 100_000;
+    const episodes = 1_000_000;
 
     var q_wins: usize = 0;
     var random_wins: usize = 0;
@@ -153,3 +153,4 @@ pub fn main(init: std.process.Init) !void {
     std.debug.print("Draws: {d} ({d:.2}%)\n", .{ eval_draws, eval_draw_rate });
     std.debug.print("Q-table states learned: {d}\n", .{qAgent.q_table.count()});
 }
+
