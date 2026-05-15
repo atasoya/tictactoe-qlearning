@@ -8,7 +8,26 @@ pub const TicTacToeState = struct {
     },
     current_player: u8 = 1,
     winner: u8 = 0,
+    move_count: u8 = 0,
 };
+
+pub fn isDraw(state: *const TicTacToeState) bool {
+    return state.move_count >= 9;
+}
+
+pub fn move(state: *TicTacToeState, action: struct { u8, u8 }) void {
+    const x = action[0];
+    const y = action[1];
+
+    if (state.board[x][y] != 0) {
+        return;
+    }
+
+    state.board[x][y] = state.current_player;
+    state.current_player = state.current_player % 2 + 1;
+
+    state.move_count += 1;
+}
 
 pub fn renderBoard(state: *const TicTacToeState) void {
     const b = state.board;

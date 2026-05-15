@@ -8,9 +8,19 @@ pub fn main(init: std.process.Init) !void {
     const secureRand = rng_impl.interface();
 
     var gameState = tictactoe.TicTacToeState{};
+    tictactoe.renderBoard(&gameState);
 
-    const action = randomAgent.randomAction(secureRand, &gameState);
-
+    var action = randomAgent.randomAction(secureRand, &gameState);
     std.debug.print("action: {any}\n", .{action});
+    tictactoe.move(&gameState, action);
+    tictactoe.renderBoard(&gameState);
+
+    while (!tictactoe.isGameWon(&gameState) and !tictactoe.isDraw(&gameState)) {
+        action = randomAgent.randomAction(secureRand, &gameState);
+        std.debug.print("action: {any}\n", .{action});
+        tictactoe.move(&gameState, action);
+        tictactoe.renderBoard(&gameState);
+    }
+    std.debug.print("winner: {any}\n", .{gameState.winner});
 }
 
