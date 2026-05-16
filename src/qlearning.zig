@@ -21,6 +21,56 @@ pub const Agent = struct {
         };
     }
 
+    pub fn loadQTableFromJson(
+        self: *Agent,
+        io: std.Io,
+        allocator: std.mem.Allocator,
+        path: []const u8,
+    ) !void {
+        const contents = try std.Io.Dir.cwd().readFileAlloc(
+            io,
+            path,
+            allocator,
+            .limited(10 * 1024 * 1024),
+        );
+        defer allocator.free(contents);
+
+        const ParsedMap = std.json.ArrayHashMap(QValues);
+
+        const parsed = try std.json.parseFromSlice(
+            ParsedMap,
+            allocator,
+            contents,
+            .{},
+        );
+        defer parsed.deinit();
+
+        var iterator = parsed.value.map.iterator();
+
+        while (iterator.next()) |entry| {
+            const key_string = entry.key_ptr.*;
+            const q_values = entry.value_ptr.*;
+
+            if (key_string.len != 9) {
+                continue;
+            }
+
+            var state_key: StateKey = undefined;
+
+            for (key_string, 0..) |char, i| {
+                if (char < '0' or char > '2') {
+                    continue;
+                }
+
+                state_key[i] = char - '0';
+            }
+
+            try self.q_table.put(state_key, q_values);
+        }
+
+        std.debug.print("Loaded Q-table states: {d}\n", .{self.q_table.count()});
+    }
+
     pub fn saveQTableToJson(self: *const Agent, io: std.Io, path: []const u8) !void {
         var file = try std.Io.Dir.cwd().createFile(io, path, .{
             .truncate = true,
@@ -212,3 +262,4 @@ pub fn rewardFor(winner: u8, agent_player: u8, is_draw: bool) f64 {
 
     return 0.0;
 }
+
