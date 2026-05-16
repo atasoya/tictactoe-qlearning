@@ -9,8 +9,24 @@ Clone the repository,
 ```bash
 git clone git@github.com:atasoya/tictactoe-qlearning.git
 cd tictactoe-qlearning
-zig build run
+zig build
 ```
-## Experiment
 
-You can play with `episodes` constant in `src/main.zig` to see how the agent performs.
+Training the agent (you can change the episodes count in `src/main.zig`):
+```bash
+./zig-out/bin/tictactoe_qlearning train
+```
+
+Evaluate the agent:
+```bash
+./zig-out/bin/tictactoe_qlearning evaluate
+```
+
+Play against the agent 
+```bash
+./zig-out/bin/tictactoe_qlearning play
+```
+Train, evaluate, then play:
+```bash
+./zig-out/bin/tictactoe_qlearning all
+```
