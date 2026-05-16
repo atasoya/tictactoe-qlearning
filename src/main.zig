@@ -18,6 +18,12 @@ pub fn main(init: std.process.Init) !void {
 
     const episodes = 1_000_000;
 
+    try train(episodes, &qAgent, secureRand, io);
+
+    try evaluate(&qAgent, secureRand);
+}
+
+pub fn train(episodes: usize, qAgent: *qlearning.Agent, secureRand: std.Random, io: std.Io) !void {
     var q_wins: usize = 0;
     var random_wins: usize = 0;
     var draws: usize = 0;
@@ -104,7 +110,10 @@ pub fn main(init: std.process.Init) !void {
     std.debug.print("Draws: {d}\n", .{draws});
     std.debug.print("Q-table states learned: {d}\n", .{qAgent.q_table.count()});
 
-    // Evaluation phase
+    try qAgent.saveQTableToJson(io, "q_table.json");
+}
+
+pub fn evaluate(qAgent: *qlearning.Agent, secureRand: std.Random) !void {
     qAgent.epsilon = 0.0;
 
     var eval_q_wins: usize = 0;

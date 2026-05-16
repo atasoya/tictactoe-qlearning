@@ -21,6 +21,55 @@ pub const Agent = struct {
         };
     }
 
+    pub fn saveQTableToJson(self: *const Agent, io: std.Io, path: []const u8) !void {
+        var file = try std.Io.Dir.cwd().createFile(io, path, .{
+            .truncate = true,
+        });
+        defer file.close(io);
+
+        var buffer: [4096]u8 = undefined;
+        var file_writer = file.writer(io, &buffer);
+        const writer = &file_writer.interface;
+
+        try writer.writeAll("{\n");
+
+        var iterator = self.q_table.iterator();
+        var first_entry = true;
+
+        while (iterator.next()) |entry| {
+            const state: StateKey = entry.key_ptr.*;
+            const q_values: QValues = entry.value_ptr.*;
+
+            if (!first_entry) {
+                try writer.writeAll(",\n");
+            }
+
+            first_entry = false;
+
+            try writer.writeAll("  \"");
+
+            for (state) |cell| {
+                try writer.print("{d}", .{cell});
+            }
+
+            try writer.writeAll("\": [");
+
+            for (q_values, 0..) |q, i| {
+                if (i != 0) {
+                    try writer.writeAll(", ");
+                }
+
+                try writer.print("{d}", .{q});
+            }
+
+            try writer.writeAll("]");
+        }
+
+        try writer.writeAll("\n}\n");
+
+        try writer.flush();
+    }
+
     pub fn deinit(self: *Agent) void {
         self.q_table.deinit();
     }
