@@ -25,7 +25,7 @@ pub fn main(init: std.process.Init) !void {
     var qAgent = qlearning.Agent.init(allocator);
     defer qAgent.deinit();
 
-    const episodes = 2_000_000;
+    const episodes = 1_000_000_000;
 
     if (std.mem.eql(u8, command, "train")) {
         try train(episodes, &qAgent, secureRand, io);
@@ -347,3 +347,4 @@ fn printUsage() void {
         \\
     , .{});
 }
+
